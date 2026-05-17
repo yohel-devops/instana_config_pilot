@@ -5,6 +5,8 @@ This folder contains the project pitch material for Instana Config Pilot.
 ## Files
 
 - `Instana-Config-Pilot-pitch.md` - Slide-by-slide pitch content and speaker flow.
+- `Instana-Config-Pilot-pitch-deck.pptx` - Editable pitch deck for the hackathon submission.
+- `create-pitch-deck.cjs` - Local script used to regenerate the PowerPoint deck from the repository assets.
 
 ## Suggested Use
 
@@ -13,6 +15,8 @@ Use the Markdown file as:
 - a speaking script,
 - source material for slides,
 - or a backup presentation outline during judging.
+
+Use the PowerPoint file as the upload source for the required slide presentation. Export it to PDF before submitting if the platform requires PDF upload.
 
 ## Recommended Slide Timing
 

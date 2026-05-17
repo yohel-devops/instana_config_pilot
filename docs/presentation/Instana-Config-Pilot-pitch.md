@@ -2,6 +2,10 @@
 
 IBM Bob Hackathon Pitch
 
+Live demo: https://instana-config-pilot.gamingraccoon.com/
+
+GitHub repository: https://github.com/yohel-devops/instana_config_pilot.git
+
 ## 1. Problem
 
 IBM Instana agent configuration often depends on large `configuration.yaml` files.
@@ -95,7 +99,7 @@ The backend remains in the repository as reference/prototype code, but it is exc
 
 Demo path:
 
-1. Open the app.
+1. Open the hosted demo: https://instana-config-pilot.gamingraccoon.com/
 2. Load the default Instana template.
 3. Show detected sensor blocks.
 4. Fill tags: `client`, `environment`, `zone`, `owner`.

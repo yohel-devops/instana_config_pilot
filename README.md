@@ -4,6 +4,11 @@ Demo application for IBM Bob: a frontend-first tool for building, validating, co
 
 Instana Config Pilot turns a large YAML configuration file into a guided visual workflow. Instead of editing sensor blocks by hand, the user can load a template, discover available `com.instana.plugin.*` blocks, select the sensors they need, fill operational tags, validate risky values, compare changes, and export the resulting files.
 
+## Project Links
+
+- Live demo: [https://instana-config-pilot.gamingraccoon.com/](https://instana-config-pilot.gamingraccoon.com/)
+- GitHub repository: [https://github.com/yohel-devops/instana_config_pilot.git](https://github.com/yohel-devops/instana_config_pilot.git)
+
 ## Features
 
 - **Frontend-first delivery** - The hackathon deliverable is the React application. YAML processing runs in the browser.

@@ -6,6 +6,10 @@ This runbook gives a concise presentation path for the IBM Bob hackathon demo.
 
 Show how Instana Config Pilot turns a large IBM Instana `configuration.yaml` template into a guided frontend workflow for SRE, DevOps, or platform teams.
 
+Hosted demo:
+
+- https://instana-config-pilot.gamingraccoon.com/
+
 The key message:
 
 > We reduce manual YAML editing risk by detecting sensors, guiding configuration, separating secrets, validating output, and comparing generated changes before they reach an Instana agent.
@@ -52,7 +56,11 @@ Warnings may exist in the current prototype; call out only blocking failures.
 
 ## Start the Demo
 
-Recommended frontend-first start:
+Recommended hosted demo:
+
+- https://instana-config-pilot.gamingraccoon.com/
+
+Local frontend-first start:
 
 ```bash
 cd frontend

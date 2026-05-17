@@ -7,6 +7,8 @@
 - Main required tool: IBM Bob IDE
 - Delivery architecture: Frontend-first React application
 - Backend status: Reference/prototype code only, excluded from final delivery scope
+- Live demo: https://instana-config-pilot.gamingraccoon.com/
+- GitHub repository: https://github.com/yohel-devops/instana_config_pilot.git
 
 ## Repository Contents
 
@@ -28,6 +30,12 @@
 - [x] `bob_sessions/README.md` explains the included files
 
 ## How To Run
+
+Hosted demo:
+
+```text
+https://instana-config-pilot.gamingraccoon.com/
+```
 
 Recommended local run:
 

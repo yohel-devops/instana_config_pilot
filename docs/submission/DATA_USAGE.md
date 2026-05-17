@@ -39,6 +39,11 @@ Generated `.env.example` output is a template only. Real values should be filled
 
 ## Public Repository Note
 
+Public project links:
+
+- Live demo: https://instana-config-pilot.gamingraccoon.com/
+- GitHub repository: https://github.com/yohel-devops/instana_config_pilot.git
+
 Before publishing or submitting the repository, review:
 
 - `bob_sessions/`
