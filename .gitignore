@@ -55,7 +55,6 @@ uploads/
 .dockerignore
 
 # Package managers
-package-lock.json
 yarn.lock
 poetry.lock
 

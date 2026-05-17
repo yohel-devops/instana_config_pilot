@@ -1,104 +1,93 @@
-# Instana Config Pilot 🚀
+# Instana Config Pilot
 
-Una herramienta web para facilitar la creación, comparación y validación de archivos de configuración YAML de IBM Instana.
+Demo application for IBM Bob: a frontend-first tool for building, validating, comparing, and exporting IBM Instana `configuration.yaml` files from an official-style template.
 
-## 📋 Descripción
+Instana Config Pilot turns a large YAML configuration file into a guided visual workflow. Instead of editing sensor blocks by hand, the user can load a template, discover available `com.instana.plugin.*` blocks, select the sensors they need, fill operational tags, validate risky values, compare changes, and export the resulting files.
 
-Instana Config Pilot resuelve los problemas comunes al gestionar archivos `configuration.yaml` de IBM Instana:
+## Features
 
-- ❌ **Errores de sintaxis** y problemas de identación
-- ❌ **Campos incompletos** o configuraciones inconsistentes
-- ❌ **Credenciales hardcodeadas** en archivos de configuración
-- ❌ **Cambios difíciles de revisar** antes de aplicar a producción
+- **Frontend-first delivery** - The hackathon deliverable is the React application. YAML processing runs in the browser.
+- **Instana sensor discovery** - Detects sensor blocks from `configuration.yaml` using `com.instana.plugin.*` keys.
+- **Dynamic sensor catalog** - Uses curated metadata for known sensors and creates fallback entries for unknown sensors found in the template.
+- **Visual configuration flow** - Select sensors, edit generated fields, and preview the final YAML without manual indentation work.
+- **Agent tags** - Supports required operational tags such as `client`, `environment`, `zone`, and `owner`.
+- **Secret separation** - Generates `.env.example` placeholders for selected sensors.
+- **Validation findings** - Flags missing required values and suspicious hardcoded secrets.
+- **YAML comparison** - Compares generated YAML against an uploaded file.
+- **Bob demo notes** - Includes an output tab for implementation/demo notes used in the IBM Bob hackathon story.
+- **Docker support** - A Compose setup exists for local/development continuity, but the backend is not part of the final deliverable.
 
-### ✨ Características
+## Current Delivery Scope
 
-- 📤 **Carga y análisis** de archivos configuration.yaml existentes
-- 🔍 **Detección automática** de 184+ sensores de Instana
-- ✏️ **Editor visual** para configurar sensores sin editar YAML manualmente
-- 🔄 **Comparación de archivos** con diff visual y estadísticas
-- 🔐 **Generación automática** de archivos .env para credenciales
-- ✅ **Validación en tiempo real** con sugerencias de mejores prácticas
-- 📦 **Descarga de bundle** completo (YAML + .env + documentación)
+The current delivery is **frontend-first**.
 
-## 🏗️ Arquitectura
+The production demo should be presented as a browser-based React tool. The core logic lives in `frontend/src/lib` and runs locally in the user's browser:
 
-```
+- sensor detection
+- catalog enrichment
+- YAML generation
+- `.env.example` generation
+- validation
+- visual diff generation
+
+The repository still contains a FastAPI backend from earlier prototype iterations. That backend is useful as historical/reference code, and it is still present in `docker-compose.yml`, but **it is excluded from the hackathon delivery scope**. Do not present the backend as part of the final functional architecture.
+
+## Hackathon Evolution
+
+The first intention was to build a complete full-stack demo with:
+
+- a web frontend,
+- a FastAPI backend,
+- API-based YAML processing,
+- and an MCP-ready integration path for agentic workflows.
+
+During the IBM Bob hackathon, BobCoins became a practical constraint. Instead of spending the remaining budget on a broader but unfinished full-stack implementation, the project pivoted to a smaller functional delivery: a frontend-first version where the core Instana configuration workflow works directly in the browser.
+
+That pivot is part of the project story. It shows a real engineering tradeoff: preserve the product value, reduce moving parts, and deliver a working demo under time and resource constraints.
+
+## Architecture
+
+```text
 instana_config_pilot/
-├── frontend/          # React + TypeScript + Vite + Tailwind CSS
-├── backend/           # FastAPI + Python
-├── instana_docs/      # Documentación de IBM Instana
-├── docker-compose.yml # Orquestación de contenedores
-└── README.md
+|-- frontend/                 # Main deliverable: React + TypeScript + Vite
+|   |-- src/
+|   |   |-- App.tsx           # Main single-page experience
+|   |   |-- data/             # Default Instana template
+|   |   |-- lib/              # Client-side YAML/sensor engines
+|   |   |-- components/       # Legacy/reusable UI components
+|   |   `-- types/            # TypeScript types
+|   |-- Dockerfile            # Static Nginx frontend image
+|   `-- package.json
+|
+|-- backend/                  # Reference/prototype FastAPI code, excluded from delivery
+|   |-- app/                  # API routers, models, services
+|   `-- Dockerfile
+|
+|-- instana_docs/             # IBM Instana source material and YAML templates
+|-- AGENTS.md                 # Non-obvious rules for Bob/AI agents
+|-- DEMO_RUNBOOK.md           # Step-by-step demo guide
+|-- docker-compose.yml        # Local/development transitional setup
+|-- MVP_ARCHITECTURE.md       # Frontend-first architecture notes
+`-- README.md
 ```
 
-### Stack Tecnológico
+### Key Documentation
 
-**Frontend:**
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS
-- Axios
-- React Dropzone
-- Lucide React (iconos)
+- [AGENTS.md](./AGENTS.md) - Critical project constraints for Bob/AI agents.
+- [DEMO_RUNBOOK.md](./DEMO_RUNBOOK.md) - Presentation flow, talking points, and troubleshooting.
+- [MVP_ARCHITECTURE.md](./MVP_ARCHITECTURE.md) - Why the project pivoted to a client-side architecture.
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Earlier full-system architecture notes.
+- [TECHNICAL_SPECS.md](./TECHNICAL_SPECS.md) - Technical details from the original planning phase.
+- [INSTRUCCIONES_FINALES.md](./INSTRUCCIONES_FINALES.md) - Historical final instructions from an earlier backend-oriented iteration.
 
-**Backend:**
-- Python 3.11+
-- FastAPI
-- Pydantic
-- PyYAML
-- difflib
+## Quick Start
 
-**Deployment:**
-- Docker
-- Docker Compose
-- Nginx
+### Prerequisites
 
-## 🚀 Inicio Rápido
+- Node.js 18+
+- npm
 
-### Prerrequisitos
-
-- Docker 20.10+
-- Docker Compose 2.0+
-
-### Instalación con Docker (Recomendado)
-
-1. **Clonar el repositorio:**
-```bash
-git clone <repository-url>
-cd instana_config_pilot
-```
-
-2. **Configurar variables de entorno:**
-```bash
-cp .env.example .env
-# Editar .env según sea necesario
-```
-
-3. **Construir y ejecutar los contenedores:**
-```bash
-docker-compose up --build
-```
-
-4. **Acceder a la aplicación:**
-- Frontend: http://localhost:80
-- Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
-
-### Instalación Manual (Desarrollo)
-
-#### Backend
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-#### Frontend
+### Option 1: Frontend Development Start
 
 ```bash
 cd frontend
@@ -106,155 +95,201 @@ npm install
 npm run dev
 ```
 
-## 📖 Uso
+Open:
 
-### 1. Cargar Archivo de Configuración
+- Frontend: http://localhost:5173
 
-- Arrastra y suelta un archivo `configuration.yaml` o haz clic para seleccionarlo
-- El sistema analizará automáticamente todos los sensores configurados
+This is the recommended path for working on the actual hackathon deliverable.
 
-### 2. Editar Configuración
+### Option 2: Docker Compose, Transitional Local Setup
 
-- Navega por la lista de sensores detectados
-- Usa el editor JSON para modificar configuraciones
-- Las validaciones se ejecutan en tiempo real
-
-### 3. Comparar Archivos
-
-- Carga dos archivos configuration.yaml
-- Visualiza diferencias con código de colores
-- Revisa estadísticas de cambios (añadidos, eliminados, modificados)
-
-### 4. Generar Archivos
-
-- Descarga el nuevo `configuration.yaml`
-- Obtén el archivo `.env.example` con variables de entorno
-- Descarga un bundle ZIP con todo incluido
-
-## 🔧 Configuración
-
-### Variables de Entorno
-
-Crea un archivo `.env` basado en `.env.example`:
-
-```env
-# Backend
-ENVIRONMENT=development
-LOG_LEVEL=info
-BACKEND_PORT=8000
-
-# Frontend
-VITE_API_URL=http://localhost:8000
-
-# CORS
-CORS_ORIGINS=http://localhost:5173,http://localhost:80
-
-# File Upload
-MAX_UPLOAD_SIZE=10485760
-ALLOWED_EXTENSIONS=.yaml,.yml
-```
-
-## 📚 API Documentation
-
-La documentación interactiva de la API está disponible en:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-### Endpoints Principales
-
-#### Upload & Parse
-- `POST /api/upload/` - Cargar y analizar archivo YAML
-
-#### Sensors
-- `GET /api/sensors/` - Listar todos los sensores
-- `GET /api/sensors/{sensor_id}` - Obtener sensor específico
-- `PUT /api/sensors/{sensor_id}` - Actualizar sensor
-- `DELETE /api/sensors/{sensor_id}` - Eliminar sensor
-
-#### Compare
-- `POST /api/compare/` - Comparar dos archivos YAML
-
-#### Generate
-- `POST /api/generate/yaml` - Generar configuration.yaml
-- `POST /api/generate/env` - Generar .env.example
-- `POST /api/generate/bundle` - Generar bundle ZIP
-
-## 🧪 Testing
-
-### Backend Tests
 ```bash
-cd backend
-pytest
+docker-compose up --build
 ```
 
-### Frontend Tests
+Current Compose services:
+
+- Frontend: http://localhost
+- Backend reference API: http://localhost:8001
+- Backend reference docs: http://localhost:8001/api/docs
+
+Important: Compose still starts the backend because the file reflects an earlier integration path. For judging/demo purposes, explain that the functional delivery is the frontend.
+
+## User Guide
+
+### Build an Instana Configuration
+
+1. Open the app.
+2. Choose the default YAML template or upload a `.yaml` / `.yml` file.
+3. Confirm the detected sensor count in the source panel.
+4. Fill the required tags:
+   - `client`
+   - `environment`
+   - `zone`
+   - `owner`
+5. Search or filter the available sensors.
+6. Enable one or more sensors.
+7. Select an enabled sensor and complete its fields.
+8. Review validation findings.
+9. Copy or download the generated `configuration.yaml`.
+
+### Generate Environment Variables
+
+1. Enable sensors that require credentials.
+2. Open the `.env.example` output tab.
+3. Download or copy the generated placeholders.
+4. Fill secret values outside the repository.
+
+### Compare YAML Files
+
+1. Switch to **Compare** mode.
+2. Upload another YAML file as File B.
+3. Review the visual diff against the generated YAML.
+4. Check validation findings for the uploaded candidate.
+
+### Use Demo Values
+
+The app includes a demo action that pre-fills tags and an IBM MQ scenario. Use this during presentations to avoid typing every field live.
+
+## Demo Data
+
+The app ships with:
+
+- A default Instana-style template at `frontend/src/data/default-template.yaml`.
+- Curated sensor metadata for common sensors such as:
+  - Host Agent
+  - Operating System
+  - IBM MQ
+  - IBM MQ Managed File Transfer
+  - IBM DB2
+  - Apache HTTPD
+  - NGINX
+  - Redis
+  - PostgreSQL
+  - Kafka
+- Dynamic fallback support for additional `com.instana.plugin.*` blocks discovered in the source YAML.
+- Demo tags and IBM MQ sample values available from the UI.
+
+## Technology Stack
+
+### Frontend, Delivery Scope
+
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS and custom CSS
+- `diff` for line-based comparison
+- Local TypeScript modules for YAML generation and validation
+
+### Backend, Reference Only
+
+- FastAPI
+- Pydantic
+- PyYAML
+- Python service modules for parsing, comparison, validation, and generation
+
+The backend remains in the repository but is excluded from the final delivery scope.
+
+## Core Frontend Modules
+
+- `frontend/src/lib/sensorDetector.ts` - Extracts `com.instana.plugin.*` blocks and tags from YAML text.
+- `frontend/src/lib/sensorCatalog.ts` - Defines known sensors and creates metadata for unknown sensors.
+- `frontend/src/lib/yamlGenerator.ts` - Produces the final `configuration.yaml`.
+- `frontend/src/lib/envGenerator.ts` - Produces `.env.example` placeholders.
+- `frontend/src/lib/validator.ts` - Reports missing fields and hardcoded-secret risks.
+- `frontend/src/lib/diffEngine.ts` - Builds the visual line diff.
+
+## Testing and Validation
+
+### Frontend Build
+
 ```bash
 cd frontend
-npm test
+npm run build
 ```
 
-## 📦 Deployment
-
-### Producción con Docker
+### Frontend Lint
 
 ```bash
-# Construir imágenes
-docker-compose build
-
-# Ejecutar en modo detached
-docker-compose up -d
-
-# Ver logs
-docker-compose logs -f
-
-# Detener servicios
-docker-compose down
+cd frontend
+npm run lint
 ```
 
-### Health Checks
+### Backend Syntax Check, Reference Only
 
-- Backend: http://localhost:8000/health
-- Frontend: http://localhost:80
+```bash
+cd backend
+python -m compileall app
+```
 
-## 🔐 Seguridad
+## Production Deployment
 
-- Las credenciales nunca se almacenan en el servidor
-- Los archivos temporales se eliminan automáticamente
-- Soporte para variables de entorno y HashiCorp Vault
-- Validación de archivos antes de procesamiento
+For the deliverable, deploy the frontend as a static site:
 
-## 📝 Documentación Adicional
+```bash
+cd frontend
+npm run build
+```
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Arquitectura del sistema
-- [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) - Plan de implementación
-- [TECHNICAL_SPECS.md](./TECHNICAL_SPECS.md) - Especificaciones técnicas
+Deploy the generated `frontend/dist` folder to a static host or serve it through Nginx.
 
-## 🤝 Contribuir
+The included `frontend/Dockerfile` builds the app and serves it with Nginx. The backend container is not required for the final frontend-first demo.
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+## Troubleshooting
 
-## 📄 Licencia
+### Frontend will not start
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+- Ensure Node.js 18+ is installed.
+- Run `npm install` inside `frontend`.
+- Check whether port `5173` is already in use.
 
-## 👥 Autores
+### Build fails in PowerShell
+
+If PowerShell blocks `npm.ps1`, run:
+
+```bash
+npm.cmd run build
+```
+
+### No sensors appear
+
+- Confirm the YAML source includes `com.instana.plugin.*` blocks.
+- Use the default template to verify the detector.
+- Check `frontend/src/lib/sensorDetector.ts` if changing detection behavior.
+
+### Generated YAML has missing values
+
+- Review the validation findings panel.
+- Complete required tags and required sensor fields.
+- Use `${ENV_VAR}` placeholders for secrets instead of hardcoded values.
+
+### Docker Compose starts backend
+
+That is expected with the current transitional Compose file. The backend is reference code and should not be presented as part of the final delivery.
+
+## Contributing
+
+1. Create a feature branch.
+2. Keep changes scoped to the frontend unless explicitly reviving backend work.
+3. Preserve existing authorship and `Made with Bob` notes.
+4. Run frontend build/lint checks before submitting.
+5. Update documentation when behavior changes.
+
+## License
+
+This project currently documents MIT intent in the original README text. Add or update a `LICENSE` file if the repository is prepared for public distribution.
+
+## Authors
 
 - **Yohel** - *Desarrollo inicial*
 
-## 🙏 Agradecimientos
+## Acknowledgements
 
-- IBM Instana por la documentación
-- Comunidad de FastAPI y React
-- Todos los contribuidores del proyecto
-
-## 📞 Soporte
-
-Para reportar bugs o solicitar features, por favor abre un issue en GitHub.
+- IBM Instana for the configuration documentation and templates.
+- IBM Bob for the hackathon development workflow.
+- The IBM Galaxium Travels demo repository for documentation structure inspiration.
+- The React, Vite, TypeScript, and FastAPI communities.
 
 ---
 
-**Nota:** Este proyecto está en desarrollo activo. Las características y la API pueden cambiar.
+Built for a practical IBM Bob hackathon demo: from Instana YAML complexity to a guided configuration workflow.
