@@ -1,0 +1,257 @@
+"""Generate router for creating configuration files"""
+from fastapi import APIRouter, Response, HTTPException
+from fastapi.responses import StreamingResponse
+from typing import List
+from app.models.sensor import Sensor
+from app.services.yaml_generator import YAMLGenerator
+from app.services.env_generator import EnvGenerator
+import io
+import zipfile
+
+router = APIRouter(prefix="/api/generate", tags=["generate"])
+
+
+@router.post("/yaml")
+async def generate_yaml(sensors: List[Sensor]):
+    """
+    Generate configuration.yaml from sensors
+    
+    Args:
+        sensors: List of sensors to include
+        
+    Returns:
+        YAML file content
+    """
+    try:
+        generator = YAMLGenerator()
+        yaml_content = generator.generate(sensors, include_comments=True)
+        
+        return Response(
+            content=yaml_content,
+            media_type="application/x-yaml",
+            headers={
+                "Content-Disposition": "attachment; filename=configuration.yaml"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate YAML: {str(e)}"
+        )
+
+
+@router.post("/yaml/minimal")
+async def generate_yaml_minimal(sensors: List[Sensor]):
+    """
+    Generate minimal configuration.yaml with only enabled sensors
+    
+    Args:
+        sensors: List of sensors
+        
+    Returns:
+        Minimal YAML file content
+    """
+    try:
+        generator = YAMLGenerator()
+        yaml_content = generator.generate_minimal(sensors)
+        
+        return Response(
+            content=yaml_content,
+            media_type="application/x-yaml",
+            headers={
+                "Content-Disposition": "attachment; filename=configuration.yaml"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate YAML: {str(e)}"
+        )
+
+
+@router.post("/yaml/with-env")
+async def generate_yaml_with_env(sensors: List[Sensor]):
+    """
+    Generate configuration.yaml with environment variable placeholders
+    
+    Args:
+        sensors: List of sensors
+        
+    Returns:
+        YAML file with ${VAR} placeholders
+    """
+    try:
+        generator = YAMLGenerator()
+        yaml_content = generator.generate_with_env_vars(sensors)
+        
+        return Response(
+            content=yaml_content,
+            media_type="application/x-yaml",
+            headers={
+                "Content-Disposition": "attachment; filename=configuration.yaml"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate YAML: {str(e)}"
+        )
+
+
+@router.post("/env")
+async def generate_env(sensors: List[Sensor]):
+    """
+    Generate .env file from sensors
+    
+    Args:
+        sensors: List of sensors
+        
+    Returns:
+        .env file content
+    """
+    try:
+        generator = EnvGenerator()
+        env_content = generator.generate(sensors)
+        
+        return Response(
+            content=env_content,
+            media_type="text/plain",
+            headers={
+                "Content-Disposition": "attachment; filename=.env.example"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate .env: {str(e)}"
+        )
+
+
+@router.post("/bundle")
+async def generate_bundle(sensors: List[Sensor]):
+    """
+    Generate ZIP bundle with both YAML and .env files
+    
+    Args:
+        sensors: List of sensors
+        
+    Returns:
+        ZIP file with configuration.yaml and .env.example
+    """
+    try:
+        yaml_gen = YAMLGenerator()
+        env_gen = EnvGenerator()
+        
+        # Generate both files
+        yaml_content = yaml_gen.generate(sensors, include_comments=True)
+        env_content = env_gen.generate(sensors)
+        
+        # Create ZIP in memory
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            zip_file.writestr('configuration.yaml', yaml_content)
+            zip_file.writestr('.env.example', env_content)
+            
+            # Add README
+            readme_content = """# Instana Configuration Files
+
+This bundle contains:
+
+1. **configuration.yaml** - Instana agent configuration file
+   - Place this file in your Instana agent configuration directory
+   - Default location: /opt/instana/agent/etc/instana/
+
+2. **.env.example** - Environment variables template
+   - Rename to .env after filling in the values
+   - Keep this file secure and never commit it to version control
+   - Add .env to your .gitignore file
+
+## Usage
+
+1. Fill in the values in .env.example
+2. Rename .env.example to .env
+3. Copy configuration.yaml to your Instana agent directory
+4. Restart the Instana agent
+
+## Documentation
+
+For more information, visit:
+https://www.ibm.com/docs/en/instana-observability
+
+Generated by Instana Config Pilot
+"""
+            zip_file.writestr('README.md', readme_content)
+        
+        zip_buffer.seek(0)
+        
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": "attachment; filename=instana-config.zip"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate bundle: {str(e)}"
+        )
+
+
+@router.post("/preview/yaml")
+async def preview_yaml(sensors: List[Sensor]):
+    """
+    Preview YAML content without downloading
+    
+    Args:
+        sensors: List of sensors
+        
+    Returns:
+        YAML content as JSON
+    """
+    try:
+        generator = YAMLGenerator()
+        yaml_content = generator.generate(sensors, include_comments=True)
+        
+        return {
+            "content": yaml_content,
+            "line_count": len(yaml_content.split('\n')),
+            "size_bytes": len(yaml_content.encode('utf-8'))
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to preview YAML: {str(e)}"
+        )
+
+
+@router.post("/preview/env")
+async def preview_env(sensors: List[Sensor]):
+    """
+    Preview .env content without downloading
+    
+    Args:
+        sensors: List of sensors
+        
+    Returns:
+        .env content as JSON
+    """
+    try:
+        generator = EnvGenerator()
+        env_content = generator.generate(sensors)
+        summary = generator.get_env_var_summary(sensors)
+        
+        return {
+            "content": env_content,
+            "line_count": len(env_content.split('\n')),
+            "size_bytes": len(env_content.encode('utf-8')),
+            "variables_by_category": summary,
+            "total_variables": sum(summary.values())
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to preview .env: {str(e)}"
+        )
+
+# Made with Bob
